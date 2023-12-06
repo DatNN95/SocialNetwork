@@ -13,6 +13,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,17 +36,28 @@ public class SecurityConfig {
     // Configuring HttpSecurity
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.csrf().disable()
-                .authorizeHttpRequests()
-                .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
-                .and()
-                .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
-                .and()
-                .authorizeHttpRequests().requestMatchers("/auth/admin/**").authenticated()
-                .and()
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+//        return http.csrf().disable()
+//                .authorizeHttpRequests()
+//                .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken","/swagger-ui/**").permitAll()
+//                .and()
+//                .authorizeHttpRequests().requestMatchers("/auth/user/**").authenticated()
+//                .and()
+//                .authorizeHttpRequests().requestMatchers("/auth/admin/**").authenticated()
+//                .and()
+//                .sessionManagement()
+//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                .authenticationProvider(authenticationProvider())
+//                .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
+//                .build();
+        return http
+                .securityMatcher("/auth/**")
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(
+                        authorize -> authorize
+                                .requestMatchers("/auth/welcome", "/auth/register", "/auth/generateToken")
+                                .permitAll()
+                )
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(authFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
